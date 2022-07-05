@@ -113,8 +113,7 @@ class _BarcodeKeyboardListenerState extends State<BarcodeKeyboardListener> {
       return;
     }
 
-    bool triggered = (!_useKeyDownEvent && keyEvent is RawKeyUpEvent) ||
-        (_useKeyDownEvent && keyEvent is RawKeyDownEvent);
+    bool triggered = (_useKeyDownEvent && keyEvent is RawKeyDownEvent);
 
     if (!triggered) {
       return;
