@@ -18,7 +18,6 @@ class BarcodeKeyboardListener extends StatefulWidget {
   final Widget child;
   final BarcodeScannedCallback _onBarcodeScanned;
   final Duration _bufferDuration;
-  final bool useKeyDownEvent;
 
   /// This widget will listen for raw PHYSICAL keyboard events
   /// even when other controls have primary focus.
@@ -34,10 +33,6 @@ class BarcodeKeyboardListener extends StatefulWidget {
       /// Callback to be called when barcode is scanned.
       required Function(String) onBarcodeScanned,
 
-      /// When experiencing issueswith empty barcodes on Windows,
-      /// set this value to true. Default value is `false`.
-      this.useKeyDownEvent = false,
-
       /// Maximum time between two key events.
       /// If time between two key events is longer than this value
       /// previous keys will be ignored.
@@ -47,8 +42,8 @@ class BarcodeKeyboardListener extends StatefulWidget {
         super(key: key);
 
   @override
-  _BarcodeKeyboardListenerState createState() => _BarcodeKeyboardListenerState(
-      _onBarcodeScanned, _bufferDuration, useKeyDownEvent);
+  _BarcodeKeyboardListenerState createState() =>
+      _BarcodeKeyboardListenerState(_onBarcodeScanned, _bufferDuration);
 }
 
 const Duration aSecond = Duration(seconds: 1);
@@ -65,10 +60,8 @@ class _BarcodeKeyboardListenerState extends State<BarcodeKeyboardListener> {
 
   final _controller = StreamController<String?>();
 
-  final bool _useKeyDownEvent;
-
-  _BarcodeKeyboardListenerState(this._onBarcodeScannedCallback,
-      this._bufferDuration, this._useKeyDownEvent) {
+  _BarcodeKeyboardListenerState(
+      this._onBarcodeScannedCallback, this._bufferDuration) {
     RawKeyboard.instance.addListener(_keyBoardCallback);
     _keyboardSubscription =
         _controller.stream.where((char) => char != null).listen(onKeyEvent);
@@ -113,7 +106,7 @@ class _BarcodeKeyboardListenerState extends State<BarcodeKeyboardListener> {
       return;
     }
 
-    bool triggered = (_useKeyDownEvent && keyEvent is RawKeyDownEvent);
+    bool triggered = keyEvent is RawKeyDownEvent;
 
     if (!triggered) {
       return;
